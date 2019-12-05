@@ -18,7 +18,7 @@ class Computer
     @debug = debug
   end
 
-  def eval
+  def eval(input = 1)
     # start by looking at the first integer (called position 0)
     ip = 0
 
@@ -46,16 +46,51 @@ class Computer
         @p[@p[ip+3]] = val1 * val2
         ip +=4
       when 3 # read
-        val = get_input
-        puts "SetInputAt #{ val } into (Position #{ @p[ip+1] })" if @debug
-        @p[@p[ip+1]] = get_input
+        puts "SetInputAt #{ input } into (Position #{ @p[ip+1] })" if @debug
+        @p[@p[ip+1]] = input
         ip += 2
       when 4 # print
-        mode = extract_mode(instruction, FIRST_PARAMETER_MODE)
-        val  = read_value(ip+1, mode)
-        puts "Print (Position #{ @p[ip+1] }) : #{ val }" if @debug
-        @output = val
+        mode1 = extract_mode(instruction, FIRST_PARAMETER_MODE)
+        val1  = read_value(ip+1, mode1)
+        puts "Print (Position #{ @p[ip+1] }) : #{ val1 }" if @debug
+        @output = val1
         ip += 2
+      when 5 # jump-if-true
+        mode1 = extract_mode(instruction, FIRST_PARAMETER_MODE)
+        val1  = read_value(ip+1, mode1)
+        mode2 = extract_mode(instruction, SECOND_PARAMETER_MODE)
+        val2  = read_value(ip+2, mode2)
+
+        puts "JumpIfTrue (#{ mode_type(mode1) } #{ @p[ip+1] } – #{ val1 }) ((#{ mode_type(mode2) } #{ @p[ip+2] } – #{ val2 }))" if @debug
+
+        ip = (not val1.zero?) ? val2 : ip+3
+      when 6 # jump-if-false
+        mode1 = extract_mode(instruction, FIRST_PARAMETER_MODE)
+        val1  = read_value(ip+1, mode1)
+        mode2 = extract_mode(instruction, SECOND_PARAMETER_MODE)
+        val2  = read_value(ip+2, mode2)
+
+        puts "JumpIfFalse (#{ mode_type(mode1) } #{ @p[ip+1] }) ((#{ mode_type(mode2) } #{ @p[ip+2] }))" if @debug
+
+        ip = val1.zero? ? val2 : ip+3
+      when 7 # less than
+        mode1 = extract_mode(instruction, FIRST_PARAMETER_MODE)
+        val1  = read_value(ip+1, mode1)
+        mode2 = extract_mode(instruction, SECOND_PARAMETER_MODE)
+        val2  = read_value(ip+2, mode2)
+
+        @p[@p[ip+3]] = val1 < val2 ? 1 : 0
+
+        ip += 4
+      when 8 # equals
+        mode1 = extract_mode(instruction, FIRST_PARAMETER_MODE)
+        val1  = read_value(ip+1, mode1)
+        mode2 = extract_mode(instruction, SECOND_PARAMETER_MODE)
+        val2  = read_value(ip+2, mode2)
+
+        @p[@p[ip+3]] = val1 == val2 ? 1 : 0
+
+        ip += 4
       when 99 then break
       else raise "Invalid opcode #{ opcode }"
       end
@@ -89,8 +124,4 @@ class Computer
     end
   end
 
-end
-
-def get_input
-  1
 end
