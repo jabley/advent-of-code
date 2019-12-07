@@ -34,12 +34,14 @@ class Computer
 
   attr_reader :output
 
-  def initialize(input, debug = false)
-    @p     = input.dup
-    @debug = debug
+  def initialize(program, input: [], output: [], debug: false)
+    @p      = program.dup
+    @input  = input
+    @output = output
+    @debug  = debug
   end
 
-  def eval(inputs)
+  def eval
     # start by looking at the first integer (called position 0)
     ip = 0
 
@@ -68,13 +70,13 @@ class Computer
         @p[@p[ip+3]] = p1.value * p2.value
         ip +=4
       when 3 # read
-        input = inputs.shift
-        puts "SetInputAt #{ input } into (Position #{ p1.index })" if @debug
-        @p[p1.index] = input
+        val = @input.shift
+        puts "SetInputAt #{ val } into (Position #{ p1.index })" if @debug
         ip += 2
+        @p[p1.index] = val
       when 4 # print
         puts "Print #{ p1 } : #{ p1.value }" if @debug
-        @output = p1.value
+        @output.push(p1.value)
         ip += 2
       when 5 # jump-if-true
         puts "JumpIfTrue #{ p1 } #{ p2 }" if @debug
@@ -93,14 +95,6 @@ class Computer
       else raise "Invalid opcode #{ opcode }"
       end
     end
-  end
-
-  def get(pos)
-    @p[pos]
-  end
-
-  def set(pos, val)
-    @p[pos] = val
   end
 
 end

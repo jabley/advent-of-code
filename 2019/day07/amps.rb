@@ -1,21 +1,36 @@
 require_relative "./computer"
 
 class Amps
-    def initialize(input)
-        @a = Computer.new(input)
-        @b = Computer.new(input)
-        @c = Computer.new(input)
-        @d = Computer.new(input)
-        @e = Computer.new(input)
+    def initialize(program)
+        @program = program
     end
 
-    def run(phases)
-        @a.eval([phases[0], 0])
-        @b.eval([phases[1], @a.output])
-        @c.eval([phases[2], @b.output])
-        @d.eval([phases[3], @c.output])
-        @e.eval([phases[4], @d.output])
+    def sequential(phases)
+        first_input = 0
 
-        @e.output
+        phases.reduce(first_input) do |input, phase_setting|
+            amp = Computer.new(@program, input: [phase_setting, input], output: [], debug: false)
+            amp.eval
+            amp.output.first
+        end
+    end
+
+    def feedback(phases)
+        channels = phases.map { |phase_setting| Queue.new.push(phase_setting) }
+
+        threads = phases.map.with_index do |_,i|
+            Thread.new do
+                amp = Computer.new(
+                    @program,
+                    input: channels[i],
+                    output: channels[(i+1)%channels.length]
+                )
+                amp.eval
+            end
+        end
+
+        channels.first.push(0)
+        threads.each(&:join)
+        channels.first.pop
     end
 end
