@@ -1,6 +1,6 @@
 require_relative "./computer"
 
-input = File.read("input.txt").strip.split(",").map(&:to_i)
+input = File.read(File.expand_path("../input.txt", __FILE__))
 c = Computer.new(input)
 
 # Before running the program, replace postion 1 with the value 12 and replace
@@ -9,25 +9,25 @@ c = Computer.new(input)
 #puts "Value at position 1 is #{ c.get(1) }"
 #puts "Value at position 2 is #{ c.get(2) }"
 
-c.set(1, 12)
-c.set(2, 2)
+c.memory[1] = 12
+c.memory[2] = 2
 
 c.eval
 
 # What value is left at position 0 after the program halts?
-puts "Part1: #{ c.get(0) }"
-
+puts "Part1: #{ c.memory[0] }"
 
 (0..99).each do |noun|
   (0..99).each do |verb|
     c = Computer.new(input)
-    c.set(1, noun)
-    c.set(2, verb)
+    c.memory[1] = noun
+    c.memory[2] = verb
 
     c.eval
 
-    if c.get(0) == 19690720
+    if c.memory[0] == 19690720
       puts "Part2: noun=#{ noun }, verb=#{ verb }, function=#{ 100 * noun + verb }"
+      exit 0
     end
   end
 end

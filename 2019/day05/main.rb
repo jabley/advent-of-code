@@ -1,14 +1,14 @@
-require_relative "./computer"
+require_relative "../day02/computer"
 
-input = File.read("input.txt").strip.split(",").map(&:to_i)
-c = Computer.new(input)
+input = File.read(File.expand_path("../input.txt", __FILE__))
+c = Computer.new(input, inputs: [1])
 
 c.eval
 
-puts "Part1: #{ c.output }"
+puts "Part1: #{ c.outputs.last }"
 
-c = Computer.new(input)
+c = Computer.new(input, inputs: [5])
 
-c.eval(5)
+c.eval
 
-puts "Part2: #{ c.output }"
+puts "Part2: #{ c.outputs.first }"

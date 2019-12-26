@@ -1,4 +1,4 @@
-require_relative "./computer"
+require_relative "../day02/computer"
 
 class Amps
     def initialize(program)
@@ -9,9 +9,9 @@ class Amps
         first_input = 0
 
         phases.reduce(first_input) do |input, phase_setting|
-            amp = Computer.new(@program, input: [phase_setting, input], output: [], debug: false)
+            amp = Computer.new(@program, inputs: [phase_setting, input], outputs: [])
             amp.eval
-            amp.output.first
+            amp.outputs.first
         end
     end
 
@@ -22,8 +22,8 @@ class Amps
             Thread.new do
                 amp = Computer.new(
                     @program,
-                    input: channels[i],
-                    output: channels[(i+1)%channels.length]
+                    inputs: channels[i],
+                    outputs: channels[(i+1)%channels.length]
                 )
                 amp.eval
             end
