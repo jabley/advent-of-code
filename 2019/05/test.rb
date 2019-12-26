@@ -1,4 +1,4 @@
-require_relative "../day02/computer"
+require_relative "../02/computer"
 
 require "test/unit"
 
