@@ -1,4 +1,4 @@
-use std::io;
+use std::{collections::HashSet, io};
 
 fn main() -> io::Result<()> {
     let seat_ids = include_str!("05.txt")
@@ -10,7 +10,19 @@ fn main() -> io::Result<()> {
 
     println!("Part 1: {}", part1);
 
+    let part2 = find_mine(&seat_ids, part1);
+
+    println!("Part 2: {}", part2);
+
     Ok(())
+}
+
+fn find_mine(seat_ids: &[usize], max_id: usize) -> usize {
+    let s: HashSet<usize> = seat_ids.iter().cloned().collect();
+
+    (1..max_id)
+        .find(|x| !s.contains(&x) && s.contains(&(*x - 1)) && s.contains(&(*x + 1)))
+        .unwrap()
 }
 
 fn max_seat_id(seat_ids: &[usize]) -> usize {
