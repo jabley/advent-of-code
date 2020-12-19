@@ -1,7 +1,8 @@
 use std::{collections::HashSet, io};
 
 struct Group {
-    answers: HashSet<char>,
+    anyone_answered: HashSet<char>,
+    everyone_answered: HashSet<char>,
 }
 
 fn main() -> io::Result<()> {
@@ -15,21 +16,49 @@ fn main() -> io::Result<()> {
 
     println!("Part 1: {}", part1);
 
+    println!(
+        "Part 2: {}",
+        groups
+            .iter()
+            .fold(0, |acc, g| acc + g.everyone_answered.len())
+    );
+
     Ok(())
 }
 
 fn sum_questions(groups: &[Group]) -> usize {
-    groups.iter().fold(0, |acc, g| acc + g.answers.len())
+    groups
+        .iter()
+        .fold(0, |acc, g| acc + g.anyone_answered.len())
 }
 
 fn parse_group(s: &str) -> Group {
-    let mut answers = HashSet::new();
+    let mut anyone_answered = HashSet::new();
+    let mut everyone_answered = HashSet::new();
+
+    let mut first = true;
 
     for line in s.lines() {
+        let mut individual_answers = HashSet::new();
+
         for c in line.chars() {
-            answers.insert(c);
+            anyone_answered.insert(c);
+            individual_answers.insert(c);
+        }
+
+        if first {
+            everyone_answered = individual_answers;
+            first = false;
+        } else {
+            everyone_answered = everyone_answered
+                .intersection(&individual_answers)
+                .cloned()
+                .collect();
         }
     }
 
-    Group { answers }
+    Group {
+        anyone_answered,
+        everyone_answered,
+    }
 }
